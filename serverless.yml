@@ -1,0 +1,40 @@
+org: i4lukatec
+app: i4-sls
+service: i4-report-pdf
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1
+  stage: dev
+  logRetentionInDays: 90
+  versionFunctions: false
+  timeout: 30
+  environment:
+    STAGE: dev
+
+custom:
+  serverless-offline:
+    httpPort: 3807
+    lambdaPort: 3907
+
+functions:
+   raspa-compilado:
+      handler: ./src/raspa/producao.producao # works to point to TypeScript, because Esbuild will compile it for us
+      timeout: 30
+      events:
+        - httpApi:
+            path: /api/raspa/producao
+            method: GET
+      layers:
+        - arn:aws:lambda:sa-east-1:372113781337:layer:chromium:2
+   about:
+     handler: ./src/about.about
+     events:
+       - httpApi:
+           path: /
+           method: GET
